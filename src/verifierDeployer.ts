@@ -26,7 +26,11 @@ export class Verifier extends LoggedDeployer {
     super();
     const networkName = hre.network.name
     this.VERIFIER_FILE = path.join(process.cwd(), `./.verifier.${networkName}.json`);
+    try {
     this.verifier = require(this.VERIFIER_FILE);
+    } catch  {
+      console.log(`Cant find ${this.VERIFIER_FILE}, started from scratch`)
+    }
     this.apiKey = process.env.ETHERSCAN_API_KEY || "";
     if (this.apiKey === "") throw new Error("No etherscan API provided");
   }
