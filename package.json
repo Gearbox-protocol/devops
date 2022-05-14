@@ -1,10 +1,9 @@
 {
-  "name": "@gearbox-protocol/contracts-devops",
-  "version": "0.0.7",
-  "description": "Gearbox Contracts Devops",
+  "name": "@gearbox-protocol/devops",
+  "version": "0.0.8",
+  "description": "Gearbox Devops for SC development",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
-  "author": "Mikael Lazarev",
   "license": "MIT",
   "scripts": {
     "build": "tsc",
