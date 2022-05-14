@@ -69,21 +69,24 @@ export class Verifier extends LoggedDeployer {
 
     this._loadVerifierJson(false);
 
-    while (true) {
-      const params = this.verifier.shift();
-      if (!params) break;
+    let next: VerifyRequest | undefined = undefined;
 
-      const isVerified = await this.isVerified(params.address);
+    do {
+      next = this.verifier.shift();
 
-      if (isVerified) {
-        this._logger.debug(`${params?.address} is already verified`);
-      } else {
-        this._logger.info(`Verifing: ${params?.address}`);
-        await hre.run("verify:verify", params);
+      if (next) {
+        const isVerified = await this.isVerified(next.address);
+
+        if (isVerified) {
+          this._logger.debug(`${next?.address} is already verified`);
+        } else {
+          this._logger.info(`Verifing: ${next?.address}`);
+          await hre.run("verify:verify", next);
+        }
       }
 
       this._saveVerifier();
-    }
+    } while (next);
   }
 
   protected _loadVerifierJson(allowEmpty: boolean) {
@@ -132,7 +135,7 @@ export class Verifier extends LoggedDeployer {
   }
 
   protected _saveVerifier() {
-    if (this.verifier.length > 0) {
+    if (this.verifier && this.verifier.length > 0) {
       fs.writeFileSync(this._fileName, JSON.stringify(this.verifier));
       this._logger.debug("Deploy progress was saved into .verifier.json");
     } else {
