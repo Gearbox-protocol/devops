@@ -50,9 +50,10 @@ export class BalanceComparator<T extends keyof any> {
         this._provider
       );
 
-      expect(await token.balanceOf(compareWith)).to.be.eq(
-        this.getBalance(stage, holder, symbol)
-      );
+      expect(
+        await token.balanceOf(compareWith),
+        ` ${stage}: different balances for ${symbol}`
+      ).to.be.eq(this.getBalance(stage, holder, symbol));
     }
   }
 
