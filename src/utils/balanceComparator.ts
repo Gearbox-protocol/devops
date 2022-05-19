@@ -28,7 +28,7 @@ export class BalanceComparator<T extends keyof any> {
     const network = await this.getNetwork();
 
     for (let symbol of this._list) {
-      let token = IERC20__factory.connect(
+      const token = IERC20__factory.connect(
         tokenDataByNetwork[network][symbol],
         this._provider
       );
@@ -56,18 +56,18 @@ export class BalanceComparator<T extends keyof any> {
     }
   }
 
-  async getNetwork(): Promise<NetworkType> {
-    if (!this._networkType) {
-      this._networkType = await detectNetwork();
-    }
-    return this._networkType;
-  }
-
   getBalance(
     stage: T,
     account: string,
     token: SupportedToken
   ): BigNumber | undefined {
     return this._balanceSnapshot[stage]?.[account]?.[token];
+  }
+
+  protected async getNetwork(): Promise<NetworkType> {
+    if (!this._networkType) {
+      this._networkType = await detectNetwork();
+    }
+    return this._networkType;
   }
 }
