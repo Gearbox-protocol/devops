@@ -41,22 +41,21 @@ export class BalanceComparator<T extends keyof any> {
     };
   }
 
-  async compareSnapshot(stage: T, holder: string, compareWith: string) {
-    const network = await this.getNetwork();
-
+  compareSnapshots(stage: T, holder: string, compareWith: string) {    
     for (let symbol of this._list) {
-      let token = IERC20__factory.connect(
-        tokenDataByNetwork[network][symbol],
-        this._provider
-      );
-
       expect(
-        await token.balanceOf(compareWith),
+        this.getBalance(stage, compareWith, symbol),
         ` ${stage}: different balances for ${symbol}`
       ).to.be.eq(this.getBalance(stage, holder, symbol));
     }
   }
-
+  
+  compareAllSnapshots(holder: string, compareWith: string) {
+    for (let stage in this._balanceSnapshot) {
+      this.compareSnapshots(stage, holder, compareWith)
+    }
+  }  
+  
   getBalance(
     stage: T,
     account: string,
