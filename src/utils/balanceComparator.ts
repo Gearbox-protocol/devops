@@ -22,7 +22,7 @@ export class BalanceComparator<T extends keyof any> {
     this._list = list;
   }
 
-  async storeBalances(stage: T, holder: string) {
+  async takeSnapshot(stage: T, holder: string) {
     let balances: Partial<Record<SupportedToken, BigNumber>> = {};
 
     const network = await this.getNetwork();
@@ -41,7 +41,7 @@ export class BalanceComparator<T extends keyof any> {
     };
   }
 
-  async compareBalances(stage: T, holder: string, compareWith: string) {
+  async compareSnapshot(stage: T, holder: string, compareWith: string) {
     const network = await this.getNetwork();
 
     for (let symbol of this._list) {
@@ -64,21 +64,26 @@ export class BalanceComparator<T extends keyof any> {
   ): BigNumber | undefined {
     return this._balanceSnapshot[stage]?.[account]?.[token];
   }
-  
+
   getBalanceOrThrow(
     stage: T,
     account: string,
     token: SupportedToken
   ): BigNumber {
+    const stageData = this._balanceSnapshot[stage];
+    if (!stageData) throw new Error(`No balances exist for stage ${stage}`);
 
-    let stageData = this._balanceSnapshot[stage];
-    if (!stageData) throw `No balances exist for stage ${stage}`;
+    const accountData = stageData[account];
+    if (!accountData)
+      throw new Error(
+        `No balances exist for stage ${stage} and account ${account}`
+      );
 
-    let accountData = stageData[account];
-    if (!accountData) throw `No balances exist for stage ${stage} and account ${account}`;
-
-    let balance = accountData[token];
-    if (!balance) throw `No balance exists for stage ${stage}, account ${account} and token ${token}`;
+    const balance = accountData[token];
+    if (!balance)
+      throw new Error(
+        `No balance exists for stage ${stage}, account ${account} and token ${token}`
+      );
 
     return balance;
   }
