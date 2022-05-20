@@ -64,6 +64,24 @@ export class BalanceComparator<T extends keyof any> {
   ): BigNumber | undefined {
     return this._balanceSnapshot[stage]?.[account]?.[token];
   }
+  
+  getBalanceOrThrow(
+    stage: T,
+    account: string,
+    token: SupportedToken
+  ): BigNumber {
+
+    let stageData = this._balanceSnapshot[stage];
+    if (!stageData) throw `No balances exist for stage ${stage}`;
+
+    let accountData = stageData[account];
+    if (!accountData) throw `No balances exist for stage ${stage} and account ${account}`;
+
+    let balance = accountData[token];
+    if (!balance) throw `No balance exists for stage ${stage}, account ${account} and token ${token}`;
+
+    return balance;
+  }
 
   protected async getNetwork(): Promise<NetworkType> {
     if (!this._networkType) {
