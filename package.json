@@ -1,6 +1,6 @@
 {
   "name": "@gearbox-protocol/devops",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "description": "Gearbox Devops for SC development",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
