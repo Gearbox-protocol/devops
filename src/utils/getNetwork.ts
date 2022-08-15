@@ -1,10 +1,10 @@
-import { ethers } from "hardhat";
 import {
   ADDRESS_0X0,
   ERC20__factory,
   NetworkType,
   tokenDataByNetwork
 } from "@gearbox-protocol/sdk";
+import { ethers } from "hardhat";
 
 export async function detectNetwork(): Promise<NetworkType> {
   const accounts = await ethers.getSigners();

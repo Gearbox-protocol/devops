@@ -1,8 +1,8 @@
-import { ethers } from "hardhat";
 import { TransactionReceipt } from "@ethersproject/providers";
-import { ContractTransaction, ContractFactory, Contract } from "ethers";
-import { Logger } from "tslog";
 import { formatBN } from "@gearbox-protocol/sdk";
+import { Contract, ContractFactory, ContractTransaction } from "ethers";
+import { ethers } from "hardhat";
+import { Logger } from "tslog";
 
 export async function waitForTransaction(
   transaction: Promise<ContractTransaction>,

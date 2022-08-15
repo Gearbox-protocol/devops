@@ -1,15 +1,11 @@
 /*
  * Copyright (c) 2021. Gearbox
  */
-import { LoggedDeployer } from "../logger/loggedDeployer";
-import * as fs from "fs";
-import { config as dotEnvConfig } from "dotenv";
 import axios from "axios";
-import path from "path";
+import * as fs from "fs";
 import hre from "hardhat";
-
-// Read .env to get ETHERSCAN_API KEY
-dotEnvConfig({ path: ".env" });
+import path from "path";
+import { LoggedDeployer } from "../logger/loggedDeployer";
 
 export interface VerifyRequest {
   address: string;

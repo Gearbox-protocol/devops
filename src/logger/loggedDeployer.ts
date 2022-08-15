@@ -12,11 +12,11 @@ export abstract class LoggedDeployer {
     });
   }
 
-  enableLogs() {
+  public enableLogs() {
     this._logger.setSettings({ minLevel: "debug" });
   }
 
-  disableLogs() {
+  public disableLogs() {
     this._logger.setSettings({ minLevel: "error" });
   }
 }

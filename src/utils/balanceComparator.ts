@@ -6,6 +6,7 @@ import {
   tokenDataByNetwork
 } from "@gearbox-protocol/sdk";
 import { BigNumber } from "ethers";
+
 import { expect } from "./expect";
 import { detectNetwork } from "./getNetwork";
 
@@ -17,12 +18,12 @@ export class BalanceComparator<T extends keyof any> {
     Record<T, Record<string, Partial<Record<SupportedToken, BigNumber>>>>
   > = {};
 
-  constructor(list: Array<SupportedToken>, _provider: Provider) {
+  public constructor(list: Array<SupportedToken>, _provider: Provider) {
     this._provider = _provider;
     this._list = list;
   }
 
-  async takeSnapshot(stage: T, holder: string) {
+  public async takeSnapshot(stage: T, holder: string) {
     let balances: Partial<Record<SupportedToken, BigNumber>> = {};
 
     const network = await this.getNetwork();
@@ -41,7 +42,7 @@ export class BalanceComparator<T extends keyof any> {
     };
   }
 
-  compareSnapshots(stage: T, holder: string, compareWith: string) {
+  public compareSnapshots(stage: T, holder: string, compareWith: string) {
     for (let symbol of this._list) {
       expect(
         this.getBalance(stage, compareWith, symbol),
@@ -50,13 +51,13 @@ export class BalanceComparator<T extends keyof any> {
     }
   }
 
-  compareAllSnapshots(holder: string, compareWith: string) {
+  public compareAllSnapshots(holder: string, compareWith: string) {
     for (let stage in this._balanceSnapshot) {
       this.compareSnapshots(stage, holder, compareWith);
     }
   }
 
-  getBalance(
+  public getBalance(
     stage: T,
     account: string,
     token: SupportedToken
@@ -64,7 +65,7 @@ export class BalanceComparator<T extends keyof any> {
     return this._balanceSnapshot[stage]?.[account]?.[token];
   }
 
-  getBalanceOrThrow(
+  public getBalanceOrThrow(
     stage: T,
     account: string,
     token: SupportedToken
