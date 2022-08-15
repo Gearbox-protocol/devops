@@ -1,4 +1,3 @@
-// @ts-ignore
 import { ethers } from "hardhat";
 import { SECONDS_PER_YEAR } from "@gearbox-protocol/sdk";
 

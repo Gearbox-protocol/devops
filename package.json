@@ -6,25 +6,29 @@
   "types": "./lib/index.d.ts",
   "license": "MIT",
   "scripts": {
+    "clean": "rm -rf lib",
     "build": "tsc",
     "dev": "tsc -w",
     "pub": "tsc && yarn publish"
   },
+  "files": [
+    "lib/"
+  ],
   "dependencies": {
     "axios": "^0.27.2"
   },
   "devDependencies": {
-    "@gearbox-protocol/sdk": "^0.0.45",
-    "@types/axios": "^0.14.0",
-    "@types/jest": "^26.0.4",
-    "@types/node": "^14.0.23",
+    "@gearbox-protocol/sdk": "^0.0.109",
+    "@nomiclabs/hardhat-ethers": "^2.1.0",
+    "@types/jest": "^28.1.6",
+    "@types/node": "^18.7.3",
     "dotenv": "^16.0.1",
     "ethereum-waffle": "^3.4.4",
-    "ethers": "^5.6.5",
-    "hardhat": "^2.9.5",
-    "jest": "^26.1.0",
-    "prettier": "^2.3.0",
+    "ethers": "^5.6.9",
+    "hardhat": "^2.10.1",
+    "jest": "^28.1.3",
+    "prettier": "^2.7.1",
     "tslog": "^3.3.3",
-    "typescript": "^4.2.4"
+    "typescript": "^4.7.4"
   }
 }

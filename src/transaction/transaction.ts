@@ -1,5 +1,4 @@
-// @ts-ignore
-import { ethers, network } from "hardhat";
+import { ethers } from "hardhat";
 import { TransactionReceipt } from "@ethersproject/providers";
 import { ContractTransaction, ContractFactory, Contract } from "ethers";
 import { Logger } from "tslog";
