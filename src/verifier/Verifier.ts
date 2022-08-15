@@ -40,6 +40,11 @@ export class Verifier extends LoggedDeployer {
     );
   }
 
+  /**
+   * Adds contract to the list of contracts that need to be verified
+   * Saves updated list into temporary file
+   * @param c
+   */
   public addContract(c: VerifyRequest) {
     if (this._knownNetwork) {
       this._loadVerifierJson(true);
@@ -60,7 +65,11 @@ export class Verifier extends LoggedDeployer {
     }
   }
 
-  public async deploy() {
+  /**
+   * Verifies all the contract in json file with contracts list
+   * Removed contracts from the list as they fet verified and saves intermediate progress
+   */
+  public async verify() {
     this.enableLogs();
 
     if (!this._knownNetwork) {
