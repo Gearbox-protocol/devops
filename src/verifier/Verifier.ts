@@ -5,6 +5,7 @@ import axios from "axios";
 import * as fs from "fs";
 import hre from "hardhat";
 import path from "path";
+
 import { LoggedDeployer } from "../logger/loggedDeployer";
 
 export interface VerifyRequest {
@@ -20,15 +21,18 @@ export class Verifier extends LoggedDeployer {
   protected readonly _knownNetwork: boolean;
   protected readonly _fileName: string;
 
-  constructor() {
+  public constructor() {
     super();
     this._networkName = hre.network.name;
 
-    this._knownNetwork =
-      this._networkName === "mainnet" || this._networkName === "kovan";
+    this._knownNetwork = ["mainnet", "kovan", "goerli"].includes(
+      this._networkName
+    );
 
     this._apiKey = process.env.ETHERSCAN_API_KEY || "";
-    if (this._apiKey === "") throw new Error("No etherscan API provided");
+    if (this._apiKey === "") {
+      throw new Error("No etherscan API provided");
+    }
 
     this._fileName = path.join(
       process.cwd(),
@@ -36,7 +40,7 @@ export class Verifier extends LoggedDeployer {
     );
   }
 
-  addContract(c: VerifyRequest) {
+  public addContract(c: VerifyRequest) {
     if (this._knownNetwork) {
       this._loadVerifierJson(true);
 
@@ -56,16 +60,16 @@ export class Verifier extends LoggedDeployer {
     }
   }
 
-  async deploy() {
+  public async deploy() {
     this.enableLogs();
 
     if (!this._knownNetwork) {
-      throw new Error(`${this._networkName} doesn't supported`);
+      throw new Error(`${this._networkName} isn't supported`);
     }
 
     this._loadVerifierJson(false);
 
-    let next: VerifyRequest | undefined = undefined;
+    let next: VerifyRequest | undefined;
 
     do {
       next = this.verifier.shift();
@@ -125,6 +129,8 @@ export class Verifier extends LoggedDeployer {
         return "https://api.etherscan.io";
       case "kovan":
         return "https://api-kovan.etherscan.io";
+      case "goerli":
+        return "https://api-goerli.etherscan.io";
       default:
         throw new Error(`${networkName} is not supported`);
     }
@@ -132,7 +138,7 @@ export class Verifier extends LoggedDeployer {
 
   protected _saveVerifier() {
     if (this.verifier && this.verifier.length > 0) {
-      fs.writeFileSync(this._fileName, JSON.stringify(this.verifier));
+      fs.writeFileSync(this._fileName, JSON.stringify(this.verifier, null, 2));
       this._logger.debug("Deploy progress was saved into .verifier.json");
     } else {
       fs.unlinkSync(this._fileName);
