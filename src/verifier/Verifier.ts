@@ -23,6 +23,7 @@ export class Verifier extends LoggedDeployer {
 
   public constructor() {
     super();
+    // this is the name of the network in hardhat.config.ts, so "testnet" won't work
     this._networkName = hre.network.name;
 
     this._knownNetwork = ["mainnet", "kovan", "goerli"].includes(
