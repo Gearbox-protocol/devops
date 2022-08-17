@@ -52,6 +52,8 @@ export class BalanceComparator<T extends keyof any> {
   }
 
   public compareAllSnapshots(holder: string, compareWith: string) {
+    // Seems to be working just fine
+    // eslint-disable-next-line guard-for-in
     for (let stage in this._balanceSnapshot) {
       this.compareSnapshots(stage, holder, compareWith);
     }
