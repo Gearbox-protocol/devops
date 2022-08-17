@@ -2,7 +2,7 @@ import {
   ADDRESS_0X0,
   ERC20__factory,
   NetworkType,
-  tokenDataByNetwork
+  tokenDataByNetwork,
 } from "@gearbox-protocol/sdk";
 import { ethers } from "hardhat";
 
@@ -13,7 +13,7 @@ export async function detectNetwork(): Promise<NetworkType> {
   try {
     const usdcMainnet = ERC20__factory.connect(
       tokenDataByNetwork.Mainnet.USDC,
-      deployer
+      deployer,
     );
     await usdcMainnet.balanceOf(ADDRESS_0X0);
     return "Mainnet";
@@ -21,7 +21,7 @@ export async function detectNetwork(): Promise<NetworkType> {
     try {
       const usdcMainnet = ERC20__factory.connect(
         tokenDataByNetwork.Kovan.USDC,
-        deployer
+        deployer,
       );
       await usdcMainnet.balanceOf(ADDRESS_0X0);
       return "Kovan";

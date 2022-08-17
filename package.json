@@ -15,11 +15,14 @@
     "lib/"
   ],
   "dependencies": {
+    "add": "^2.0.6",
     "axios": "^0.27.2",
-    "chai": "^4.3.6"
+    "chai": "^4.3.6",
+    "yarn": "^1.22.19"
   },
   "devDependencies": {
-    "@gearbox-protocol/eslint-config": "https://github.com/doomsower/gearbox-eslint-config.git",
+    "@gearbox-protocol/eslint-config": "https://gitpkg.now.sh/Gearbox-protocol/style-guide/packages/eslint-config?44ac6862eb947169e650c3ec7e7954c6ee0a8c8e",
+    "@gearbox-protocol/prettier-config": "https://gitpkg.now.sh/Gearbox-protocol/style-guide/packages/prettier-config?44ac6862eb947169e650c3ec7e7954c6ee0a8c8e",
     "@gearbox-protocol/sdk": "^0.0.109",
     "@nomiclabs/hardhat-ethers": "^2.1.0",
     "@types/chai": "^4.3.3",
@@ -39,5 +42,6 @@
     "@nomiclabs/hardhat-ethers": "*",
     "ethers": "*",
     "hardhat": "*"
-  }
+  },
+  "prettier": "@gearbox-protocol/prettier-config"
 }

@@ -8,7 +8,7 @@ export abstract class LoggedDeployer {
       minLevel: "error",
       displayFunctionName: false,
       displayLoggerName: false,
-      displayFilePath: "hidden"
+      displayFilePath: "hidden",
     });
   }
 

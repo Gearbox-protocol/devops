@@ -8,7 +8,7 @@ import { Verifier } from "../verifier";
 
 export async function waitForTransaction(
   transaction: Promise<ContractTransaction>,
-  logger?: Logger
+  logger?: Logger,
 ): Promise<TransactionReceipt> {
   const request = await transaction;
   const txReceipt = await request.wait();
@@ -18,11 +18,11 @@ export async function waitForTransaction(
     logger.debug(
       `Gas used: ${txReceipt.gasUsed.toString()} @ ${formatBN(
         txReceipt.effectiveGasPrice,
-        9
+        9,
       )} gwei.  Total: ${formatBN(
         txReceipt.gasUsed.mul(txReceipt.effectiveGasPrice),
-        18
-      )} ETH`
+        18,
+      )} ETH`,
     );
   }
 
@@ -56,17 +56,17 @@ export async function deploy<T extends Contract>(
   options?.logger?.debug(
     `Gas used: ${txReceipt.gasUsed.toString()} @ ${formatBN(
       txReceipt.effectiveGasPrice,
-      9
+      9,
     )} gwei.  Total: ${formatBN(
       txReceipt.gasUsed.mul(txReceipt.effectiveGasPrice),
-      18
-    )} ETH`
+      18,
+    )} ETH`,
   );
 
   if (options?.verifier) {
     options.verifier.addContract({
       address: contract.address,
-      constructorArguments: args
+      constructorArguments: args,
     });
   }
 

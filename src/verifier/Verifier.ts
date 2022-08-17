@@ -27,7 +27,7 @@ export class Verifier extends LoggedDeployer {
     this._networkName = hre.network.name;
 
     this._knownNetwork = ["mainnet", "kovan", "goerli"].includes(
-      this._networkName
+      this._networkName,
     );
 
     this._apiKey = process.env.ETHERSCAN_API_KEY || "";
@@ -37,7 +37,7 @@ export class Verifier extends LoggedDeployer {
 
     this._fileName = path.join(
       process.cwd(),
-      `./.verifier.${this._networkName}.json`
+      `./.verifier.${this._networkName}.json`,
     );
   }
 
@@ -53,7 +53,7 @@ export class Verifier extends LoggedDeployer {
       // Add logic to check if address is already exists
       // Overwriting info for now
       this.verifier = this.verifier.filter(
-        request => request.address.toLowerCase() !== c.address.toLowerCase()
+        request => request.address.toLowerCase() !== c.address.toLowerCase(),
       );
 
       this.verifier.push(c);
@@ -61,7 +61,7 @@ export class Verifier extends LoggedDeployer {
       this._saveVerifier();
     } else {
       this._logger.debug(
-        `Skipping verification for unknown ${this._networkName} network`
+        `Skipping verification for unknown ${this._networkName} network`,
       );
     }
   }
@@ -125,7 +125,7 @@ export class Verifier extends LoggedDeployer {
 
   protected async isVerified(address: string): Promise<boolean> {
     const url = `${this._baseUrl(
-      this._networkName
+      this._networkName,
     )}/api?module=contract&action=getabi&address=${address}&apikey=${
       this._apiKey
     }`;
