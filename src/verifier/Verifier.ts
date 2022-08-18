@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2021. Gearbox
  */
+import { callRepeater } from "@gearbox-protocol/sdk";
 import axios from "axios";
 import * as fs from "fs";
 import hre from "hardhat";
@@ -68,7 +69,7 @@ export class Verifier extends LoggedDeployer {
 
   /**
    * Verifies all the contract in json file with contracts list
-   * Removed contracts from the list as they fet verified and saves intermediate progress
+   * Removed contracts from the list as they get verified and saves intermediate progress
    */
   public async verify() {
     this.enableLogs();
@@ -79,24 +80,31 @@ export class Verifier extends LoggedDeployer {
 
     this._loadVerifierJson(false);
 
-    let next: VerifyRequest | undefined;
+    const failed: VerifyRequest[] = [];
 
-    do {
-      next = this.verifier.shift();
-
-      if (next) {
-        const isVerified = await this.isVerified(next.address);
-
-        if (isVerified) {
-          this._logger.debug(`${next?.address} is already verified`);
-        } else {
-          this._logger.info(`Verifing: ${next?.address}`);
-          await hre.run("verify:verify", next);
-        }
+    for (let next of this.verifier) {
+      try {
+        await callRepeater(() => this.verifyOne(next), 3);
+      } catch (e) {
+        this._logger.warn(`Failed to verify ${next.address}: ${e}`);
+        failed.push(next);
       }
+    }
 
-      this._saveVerifier();
-    } while (next);
+    this.verifier = failed;
+    this._saveVerifier();
+  }
+
+  protected async verifyOne(req: VerifyRequest): Promise<void> {
+    const isVerified = await this.isVerified(req.address);
+
+    if (isVerified) {
+      this._logger.debug(`${req?.address} is already verified`);
+    } else {
+      this._logger.info(`Verifing: ${req?.address}`);
+      await hre.run("verify:verify", req);
+      this._logger.debug("ok");
+    }
   }
 
   protected _loadVerifierJson(allowEmpty: boolean) {
