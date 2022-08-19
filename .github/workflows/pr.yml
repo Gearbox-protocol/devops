@@ -9,7 +9,7 @@ env:
   CI: true
 
 jobs:
-  build:
+  checks:
     runs-on: ubuntu-latest
 
     steps:
