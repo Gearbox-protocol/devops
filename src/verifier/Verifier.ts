@@ -1,15 +1,13 @@
 /*
  * Copyright (c) 2021. Gearbox
  */
-import { LoggedDeployer } from "../logger/loggedDeployer";
-import * as fs from "fs";
-import { config as dotEnvConfig } from "dotenv";
+import { callRepeater } from "@gearbox-protocol/sdk";
 import axios from "axios";
-import path from "path";
+import * as fs from "fs";
 import hre from "hardhat";
+import path from "path";
 
-// Read .env to get ETHERSCAN_API KEY
-dotEnvConfig({ path: ".env" });
+import { LoggedDeployer } from "../logger/loggedDeployer";
 
 export interface VerifyRequest {
   address: string;
@@ -24,30 +22,39 @@ export class Verifier extends LoggedDeployer {
   protected readonly _knownNetwork: boolean;
   protected readonly _fileName: string;
 
-  constructor() {
+  public constructor() {
     super();
+    // this is the name of the network in hardhat.config.ts, so "testnet" won't work
     this._networkName = hre.network.name;
 
-    this._knownNetwork =
-      this._networkName === "mainnet" || this._networkName === "kovan";
+    this._knownNetwork = ["mainnet", "kovan", "goerli"].includes(
+      this._networkName,
+    );
 
     this._apiKey = process.env.ETHERSCAN_API_KEY || "";
-    if (this._apiKey === "") throw new Error("No etherscan API provided");
+    if (this._apiKey === "") {
+      throw new Error("No etherscan API provided");
+    }
 
     this._fileName = path.join(
       process.cwd(),
-      `./.verifier.${this._networkName}.json`
+      `./.verifier.${this._networkName}.json`,
     );
   }
 
-  addContract(c: VerifyRequest) {
+  /**
+   * Adds contract to the list of contracts that need to be verified
+   * Saves updated list into temporary file
+   * @param c
+   */
+  public addContract(c: VerifyRequest) {
     if (this._knownNetwork) {
       this._loadVerifierJson(true);
 
       // Add logic to check if address is already exists
       // Overwriting info for now
       this.verifier = this.verifier.filter(
-        request => request.address.toLowerCase() !== c.address.toLowerCase()
+        request => request.address.toLowerCase() !== c.address.toLowerCase(),
       );
 
       this.verifier.push(c);
@@ -55,38 +62,49 @@ export class Verifier extends LoggedDeployer {
       this._saveVerifier();
     } else {
       this._logger.debug(
-        `Skipping verification for unknown ${this._networkName} network`
+        `Skipping verification for unknown ${this._networkName} network`,
       );
     }
   }
 
-  async deploy() {
+  /**
+   * Verifies all the contract in json file with contracts list
+   * Removed contracts from the list as they get verified and saves intermediate progress
+   */
+  public async verify() {
     this.enableLogs();
 
     if (!this._knownNetwork) {
-      throw new Error(`${this._networkName} doesn't supported`);
+      throw new Error(`${this._networkName} isn't supported`);
     }
 
     this._loadVerifierJson(false);
 
-    let next: VerifyRequest | undefined = undefined;
+    const failed: VerifyRequest[] = [];
 
-    do {
-      next = this.verifier.shift();
-
-      if (next) {
-        const isVerified = await this.isVerified(next.address);
-
-        if (isVerified) {
-          this._logger.debug(`${next?.address} is already verified`);
-        } else {
-          this._logger.info(`Verifing: ${next?.address}`);
-          await hre.run("verify:verify", next);
-        }
+    for (let next of this.verifier) {
+      try {
+        await callRepeater(() => this.verifyOne(next), 3);
+      } catch (e) {
+        this._logger.warn(`Failed to verify ${next.address}: ${e}`);
+        failed.push(next);
       }
+    }
 
-      this._saveVerifier();
-    } while (next);
+    this.verifier = failed;
+    this._saveVerifier();
+  }
+
+  protected async verifyOne(req: VerifyRequest): Promise<void> {
+    const isVerified = await this.isVerified(req.address);
+
+    if (isVerified) {
+      this._logger.debug(`${req?.address} is already verified`);
+    } else {
+      this._logger.info(`Verifing: ${req?.address}`);
+      await hre.run("verify:verify", req);
+      this._logger.debug("ok");
+    }
   }
 
   protected _loadVerifierJson(allowEmpty: boolean) {
@@ -115,7 +133,7 @@ export class Verifier extends LoggedDeployer {
 
   protected async isVerified(address: string): Promise<boolean> {
     const url = `${this._baseUrl(
-      this._networkName
+      this._networkName,
     )}/api?module=contract&action=getabi&address=${address}&apikey=${
       this._apiKey
     }`;
@@ -129,6 +147,8 @@ export class Verifier extends LoggedDeployer {
         return "https://api.etherscan.io";
       case "kovan":
         return "https://api-kovan.etherscan.io";
+      case "goerli":
+        return "https://api-goerli.etherscan.io";
       default:
         throw new Error(`${networkName} is not supported`);
     }
@@ -136,7 +156,7 @@ export class Verifier extends LoggedDeployer {
 
   protected _saveVerifier() {
     if (this.verifier && this.verifier.length > 0) {
-      fs.writeFileSync(this._fileName, JSON.stringify(this.verifier));
+      fs.writeFileSync(this._fileName, JSON.stringify(this.verifier, null, 2));
       this._logger.debug("Deploy progress was saved into .verifier.json");
     } else {
       fs.unlinkSync(this._fileName);
