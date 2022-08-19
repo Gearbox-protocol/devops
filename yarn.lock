@@ -817,10 +817,10 @@
   resolved "https://registry.yarnpkg.com/@gearbox-protocol/prettier-config/-/prettier-config-1.4.1.tgz#fb6a5d05c65d5c3b4cff2e8a6a02253fd03d129f"
   integrity sha512-z0tYKN/hlu0okIjJvTtxEeEPJyQ8x4PAqODtTi6URiZ8Ui1pj+hz8WkIkAx46dlCZTxmAZQ9p55NRETbWr+Ebg==
 
-"@gearbox-protocol/sdk@^0.0.109":
-  version "0.0.109"
-  resolved "https://registry.yarnpkg.com/@gearbox-protocol/sdk/-/sdk-0.0.109.tgz#61f7b9fc3af63e53f853977817c0460189e0fcaa"
-  integrity sha512-dt6gtDyYcWaixpDYTaiaf63XZ0aiNS3BcY7E70zjKwJzmN3LYAcW7mEd7QGmD7w1irsSEOtXpkwaz8/8YYAd1w==
+"@gearbox-protocol/sdk@^0.0.110":
+  version "0.0.110"
+  resolved "https://registry.yarnpkg.com/@gearbox-protocol/sdk/-/sdk-0.0.110.tgz#422f7c0bf2de8ebefbdbe455d181ca5dc6a26158"
+  integrity sha512-OX1WApDcQJ5Fy66YAL38p9kXTREOfXjcduaWQVHRhWWEEdnjDbp8iYKe4wz2ZxzikVdBb037VY0YxItWPD5Hdw==
   dependencies:
     decimal.js-light "^2.5.1"
     moment "^2.29.1"

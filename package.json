@@ -2,9 +2,12 @@
   "name": "@gearbox-protocol/devops",
   "version": "1.0.0",
   "description": "Gearbox Devops for SC development",
+  "license": "MIT",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
-  "license": "MIT",
+  "files": [
+    "lib/"
+  ],
   "scripts": {
     "clean": "rm -rf lib",
     "build": "tsc",
@@ -12,11 +15,11 @@
     "pub": "tsc && yarn publish",
     "prepare": "husky install",
     "prettier": "prettier --write .",
-    "lint": "eslint \"**/*.ts\" --fix"
+    "prettier:ci": "npx prettier --check .",
+    "lint": "eslint \"**/*.ts\" --fix",
+    "lint:ci": "eslint \"**/*.ts\"",
+    "typecheck:ci": "tsc --noEmit"
   },
-  "files": [
-    "lib/"
-  ],
   "dependencies": {
     "axios": "^0.27.2",
     "chai": "^4.3.6"
@@ -24,7 +27,7 @@
   "devDependencies": {
     "@gearbox-protocol/eslint-config": "^1.4.1",
     "@gearbox-protocol/prettier-config": "^1.4.1",
-    "@gearbox-protocol/sdk": "^0.0.109",
+    "@gearbox-protocol/sdk": "^0.0.110",
     "@nomiclabs/hardhat-ethers": "^2.1.1",
     "@types/chai": "^4.3.3",
     "@types/jest": "^28.1.7",
