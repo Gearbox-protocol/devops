@@ -19,9 +19,19 @@ jobs:
         with:
           cache: "yarn"
           node-version-file: ".nvmrc"
-      - name: Perform checks
+
+      # No lint or prettier here since they were supposed to run on PR action
+      - name: Build
         run: |
           yarn install --frozen-lockfile
           yarn build
-          yarn lint:ci
-          yarn prettier:ci
+
+      - name: Semantic Release
+        uses: cycjimmy/semantic-release-action@v3
+        with:
+          extra_plugins: |
+            @semantic-release/git
+          dry_run: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
