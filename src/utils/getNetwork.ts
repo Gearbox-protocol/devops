@@ -1,6 +1,6 @@
 import {
   ADDRESS_0X0,
-  ERC20__factory,
+  IERC20__factory,
   NetworkType,
   tokenDataByNetwork,
 } from "@gearbox-protocol/sdk";
@@ -11,7 +11,7 @@ export async function detectNetwork(): Promise<NetworkType> {
   const deployer = accounts[0];
 
   try {
-    const usdcMainnet = ERC20__factory.connect(
+    const usdcMainnet = IERC20__factory.connect(
       tokenDataByNetwork.Mainnet.USDC,
       deployer,
     );
@@ -19,12 +19,12 @@ export async function detectNetwork(): Promise<NetworkType> {
     return "Mainnet";
   } catch {
     try {
-      const usdcMainnet = ERC20__factory.connect(
-        tokenDataByNetwork.Kovan.USDC,
+      const usdcMainnet = IERC20__factory.connect(
+        tokenDataByNetwork.Goerli.USDC,
         deployer,
       );
       await usdcMainnet.balanceOf(ADDRESS_0X0);
-      return "Kovan";
+      return "Goerli";
     } catch {
       throw new Error("Unknown network");
     }
