@@ -28,9 +28,9 @@
     "chai": "^4.3.6"
   },
   "devDependencies": {
-    "@gearbox-protocol/eslint-config": "^1.4.1",
+    "@gearbox-protocol/eslint-config": "^1.5.7",
     "@gearbox-protocol/prettier-config": "^1.4.1",
-    "@gearbox-protocol/sdk": "^0.0.110",
+    "@gearbox-protocol/sdk": "^1.2.0",
     "@nomiclabs/hardhat-ethers": "^2.1.1",
     "@types/chai": "^4.3.3",
     "@types/jest": "^28.1.7",

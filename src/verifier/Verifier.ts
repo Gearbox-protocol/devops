@@ -27,9 +27,7 @@ export class Verifier extends LoggedDeployer {
     // this is the name of the network in hardhat.config.ts, so "testnet" won't work
     this._networkName = hre.network.name;
 
-    this._knownNetwork = ["mainnet", "kovan", "goerli"].includes(
-      this._networkName,
-    );
+    this._knownNetwork = ["mainnet", "goerli"].includes(this._networkName);
 
     this._apiKey = process.env.ETHERSCAN_API_KEY || "";
     if (this._apiKey === "") {
@@ -145,8 +143,6 @@ export class Verifier extends LoggedDeployer {
     switch (networkName) {
       case "mainnet":
         return "https://api.etherscan.io";
-      case "kovan":
-        return "https://api-kovan.etherscan.io";
       case "goerli":
         return "https://api-goerli.etherscan.io";
       default:
