@@ -1,16 +1,23 @@
 // @ts-ignore
 import { ethers, network } from "hardhat";
 import { TransactionReceipt } from "@ethersproject/providers";
-import { ContractTransaction, ContractFactory, Contract } from "ethers";
+import { ContractTransaction, ContractFactory, Contract, Signer } from "ethers";
 import { Logger } from "tslog";
 import { formatBN } from "@gearbox-protocol/sdk";
+
+const waitingTime = async () => {
+  // Gets accounts
+  const chainId = await ((await ethers.getSigners())[0] as Signer).getChainId();
+
+  return chainId === 1337 ? 0 : chainId === 42 ? 2 : 4;
+};
 
 export async function waitForTransaction(
   transaction: Promise<ContractTransaction>,
   logger?: Logger
 ): Promise<TransactionReceipt> {
   const request = await transaction;
-  const txReceipt = await request.wait();
+  const txReceipt = await request.wait(await waitingTime());
 
   if (logger) {
     logger.debug(`Tx: ${txReceipt.transactionHash}`);
@@ -43,7 +50,7 @@ export async function deploy<T extends Contract>(
   const contract = (await artifact.deploy(...args)) as T;
   logger?.debug(`Deploying ${name}...`);
   await contract.deployed();
-  const txReceipt = await contract.deployTransaction.wait();
+  const txReceipt = await contract.deployTransaction.wait(await waitingTime());
   logger?.debug(`Deployed ${name} to ${contract.address}`);
   logger?.debug(`Tx: ${txReceipt.transactionHash}`);
   logger?.debug(

@@ -41,21 +41,21 @@ export class BalanceComparator<T extends keyof any> {
     };
   }
 
-  compareSnapshots(stage: T, holder: string, compareWith: string) {    
+  compareSnapshots(stage: T, holder: string, compareWith: string) {
     for (let symbol of this._list) {
       expect(
         this.getBalance(stage, compareWith, symbol),
-        ` ${stage}: different balances for ${symbol}`
+        ` ${String(stage)}: different balances for ${symbol}`
       ).to.be.eq(this.getBalance(stage, holder, symbol));
     }
   }
-  
+
   compareAllSnapshots(holder: string, compareWith: string) {
     for (let stage in this._balanceSnapshot) {
-      this.compareSnapshots(stage, holder, compareWith)
+      this.compareSnapshots(stage, holder, compareWith);
     }
-  }  
-  
+  }
+
   getBalance(
     stage: T,
     account: string,
@@ -70,18 +70,21 @@ export class BalanceComparator<T extends keyof any> {
     token: SupportedToken
   ): BigNumber {
     const stageData = this._balanceSnapshot[stage];
-    if (!stageData) throw new Error(`No balances exist for stage ${stage}`);
+    if (!stageData)
+      throw new Error(`No balances exist for stage ${String(stage)}`);
 
     const accountData = stageData[account];
     if (!accountData)
       throw new Error(
-        `No balances exist for stage ${stage} and account ${account}`
+        `No balances exist for stage ${String(stage)} and account ${account}`
       );
 
     const balance = accountData[token];
     if (!balance)
       throw new Error(
-        `No balance exists for stage ${stage}, account ${account} and token ${token}`
+        `No balance exists for stage ${String(
+          stage
+        )}, account ${account} and token ${token}`
       );
 
     return balance;
