@@ -3,9 +3,10 @@ import {
   IERC20__factory,
   NetworkType,
   SupportedToken,
-  tokenDataByNetwork
+  tokenDataByNetwork,
 } from "@gearbox-protocol/sdk";
 import { BigNumber } from "ethers";
+
 import { expect } from "./expect";
 import { detectNetwork } from "./getNetwork";
 
@@ -17,12 +18,12 @@ export class BalanceComparator<T extends keyof any> {
     Record<T, Record<string, Partial<Record<SupportedToken, BigNumber>>>>
   > = {};
 
-  constructor(list: Array<SupportedToken>, _provider: Provider) {
+  public constructor(list: Array<SupportedToken>, _provider: Provider) {
     this._provider = _provider;
     this._list = list;
   }
 
-  async takeSnapshot(stage: T, holder: string) {
+  public async takeSnapshot(stage: T, holder: string) {
     let balances: Partial<Record<SupportedToken, BigNumber>> = {};
 
     const network = await this.getNetwork();
@@ -30,44 +31,46 @@ export class BalanceComparator<T extends keyof any> {
     for (let symbol of this._list) {
       const token = IERC20__factory.connect(
         tokenDataByNetwork[network][symbol],
-        this._provider
+        this._provider,
       );
       balances[symbol] = await token.balanceOf(holder);
     }
 
     this._balanceSnapshot[stage] = {
       ...this._balanceSnapshot[stage],
-      [holder]: balances
+      [holder]: balances,
     };
   }
 
-  compareSnapshots(stage: T, holder: string, compareWith: string) {
+  public compareSnapshots(stage: T, holder: string, compareWith: string) {
     for (let symbol of this._list) {
       expect(
         this.getBalance(stage, compareWith, symbol),
-        ` ${String(stage)}: different balances for ${symbol}`
+        ` ${String(stage)}: different balances for ${symbol}`,
       ).to.be.eq(this.getBalance(stage, holder, symbol));
     }
   }
 
-  compareAllSnapshots(holder: string, compareWith: string) {
+  public compareAllSnapshots(holder: string, compareWith: string) {
+    // Seems to be working just fine
+    // eslint-disable-next-line guard-for-in
     for (let stage in this._balanceSnapshot) {
       this.compareSnapshots(stage, holder, compareWith);
     }
   }
 
-  getBalance(
+  public getBalance(
     stage: T,
     account: string,
-    token: SupportedToken
+    token: SupportedToken,
   ): BigNumber | undefined {
     return this._balanceSnapshot[stage]?.[account]?.[token];
   }
 
-  getBalanceOrThrow(
+  public getBalanceOrThrow(
     stage: T,
     account: string,
-    token: SupportedToken
+    token: SupportedToken,
   ): BigNumber {
     const stageData = this._balanceSnapshot[stage];
     if (!stageData)
@@ -76,15 +79,15 @@ export class BalanceComparator<T extends keyof any> {
     const accountData = stageData[account];
     if (!accountData)
       throw new Error(
-        `No balances exist for stage ${String(stage)} and account ${account}`
+        `No balances exist for stage ${String(stage)} and account ${account}`,
       );
 
     const balance = accountData[token];
     if (!balance)
       throw new Error(
         `No balance exists for stage ${String(
-          stage
-        )}, account ${account} and token ${token}`
+          stage,
+        )}, account ${account} and token ${token}`,
       );
 
     return balance;

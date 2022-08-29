@@ -1,6 +1,5 @@
-// @ts-ignore
-import { ethers } from "hardhat";
 import { SECONDS_PER_YEAR } from "@gearbox-protocol/sdk";
+import { ethers } from "hardhat";
 
 const getTimestamp = async (blockN?: number) => {
   const blockNum = blockN || (await ethers.provider.getBlockNumber());
