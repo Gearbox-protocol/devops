@@ -18,6 +18,7 @@ export class BalanceComparator<T extends keyof any> {
     Record<T, Record<string, Partial<Record<SupportedToken, BigNumber>>>>
   > = {};
 
+  
   public constructor(list: Array<SupportedToken>, _provider: Provider) {
     this._provider = _provider;
     this._list = list;
