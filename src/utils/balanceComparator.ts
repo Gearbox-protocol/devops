@@ -44,9 +44,9 @@ export class BalanceComparator<T extends keyof any> {
   compareSnapshots(stage: T, holder: string, compareWith: string) {
     for (let symbol of this._list) {
       expect(
-        this.getBalance(stage, compareWith, symbol),
+        this.getBalanceOrThrow(stage, compareWith, symbol),
         ` ${String(stage)}: different balances for ${symbol}`
-      ).to.be.eq(this.getBalance(stage, holder, symbol));
+      ).to.be.eq(this.getBalanceOrThrow(stage, holder, symbol));
     }
   }
 
@@ -54,14 +54,6 @@ export class BalanceComparator<T extends keyof any> {
     for (let stage in this._balanceSnapshot) {
       this.compareSnapshots(stage, holder, compareWith);
     }
-  }
-
-  getBalance(
-    stage: T,
-    account: string,
-    token: SupportedToken
-  ): BigNumber | undefined {
-    return this._balanceSnapshot[stage]?.[account]?.[token];
   }
 
   getBalanceOrThrow(
