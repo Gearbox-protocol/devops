@@ -5,21 +5,23 @@ import {
   SupportedToken,
   tokenDataByNetwork,
 } from "@gearbox-protocol/sdk";
-import { BigNumber } from "ethers";
+import { BigNumber, Signer } from "ethers";
 
 import { expect } from "./expect";
 import { detectNetwork } from "./getNetwork";
 
 export class BalanceComparator<T extends keyof any> {
   protected readonly _list: Array<SupportedToken>;
-  protected readonly _provider: Provider;
+  protected readonly _provider: Provider | Signer;
   protected _networkType: NetworkType | undefined;
   protected _balanceSnapshot: Partial<
     Record<T, Record<string, Partial<Record<SupportedToken, BigNumber>>>>
   > = {};
 
-  
-  public constructor(list: Array<SupportedToken>, _provider: Provider) {
+  public constructor(
+    list: Array<SupportedToken>,
+    _provider: Provider | Signer,
+  ) {
     this._provider = _provider;
     this._list = list;
   }
@@ -47,7 +49,7 @@ export class BalanceComparator<T extends keyof any> {
     for (let symbol of this._list) {
       expect(
         this.getBalanceOrThrow(stage, compareWith, symbol),
-        ` ${String(stage)}: different balances for ${symbol}`
+        ` ${String(stage)}: different balances for ${symbol}`,
       ).to.be.eq(this.getBalanceOrThrow(stage, holder, symbol));
     }
   }
@@ -63,7 +65,7 @@ export class BalanceComparator<T extends keyof any> {
   getBalanceOrThrow(
     stage: T,
     account: string,
-    token: SupportedToken
+    token: SupportedToken,
   ): BigNumber {
     const stageData = this._balanceSnapshot[stage];
     if (!stageData)
