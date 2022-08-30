@@ -1,20 +1,31 @@
-// @ts-ignore
-import { ethers, network } from "hardhat";
 import { TransactionReceipt } from "@ethersproject/providers";
-import { ContractTransaction, ContractFactory, Contract, Signer } from "ethers";
+import {
+  formatBN,
+  GOERLI_NETWORK,
+  HARDHAT_NETWORK,
+  LOCAL_NETWORK,
+} from "@gearbox-protocol/sdk";
+import { Contract, ContractFactory, ContractTransaction } from "ethers";
+import { ethers } from "hardhat";
 import { Logger } from "tslog";
-import { formatBN } from "@gearbox-protocol/sdk";
+
+import { Verifier } from "../verifier";
 
 const waitingTime = async () => {
-  // Gets accounts
-  const chainId = await ((await ethers.getSigners())[0] as Signer).getChainId();
+  const accounts = await ethers.getSigners();
+  const deployer = accounts[0];
+  const chainId = await deployer.getChainId();
 
-  return chainId === 1337 ? 0 : chainId === 42 ? 2 : 4;
+  return chainId === LOCAL_NETWORK || chainId === HARDHAT_NETWORK
+    ? 0
+    : chainId === GOERLI_NETWORK
+    ? 2
+    : 4;
 };
 
 export async function waitForTransaction(
   transaction: Promise<ContractTransaction>,
-  logger?: Logger
+  logger?: Logger,
 ): Promise<TransactionReceipt> {
   const request = await transaction;
   const txReceipt = await request.wait(await waitingTime());
@@ -24,11 +35,11 @@ export async function waitForTransaction(
     logger.debug(
       `Gas used: ${txReceipt.gasUsed.toString()} @ ${formatBN(
         txReceipt.effectiveGasPrice,
-        9
+        9,
       )} gwei.  Total: ${formatBN(
         txReceipt.gasUsed.mul(txReceipt.effectiveGasPrice),
-        18
-      )} ETH`
+        18,
+      )} ETH`,
     );
   }
 
@@ -56,11 +67,33 @@ export async function deploy<T extends Contract>(
   logger?.debug(
     `Gas used: ${txReceipt.gasUsed.toString()} @ ${formatBN(
       txReceipt.effectiveGasPrice,
-      9
+      9,
     )} gwei.  Total: ${formatBN(
       txReceipt.gasUsed.mul(txReceipt.effectiveGasPrice),
-      18
-    )} ETH`
+      18,
+    )} ETH`,
   );
+  return contract;
+}
+
+export interface DeployOptions {
+  logger?: Logger;
+  verifier?: Verifier;
+}
+
+export async function deployWithOptions<T extends Contract>(
+  name: string,
+  options: DeployOptions | undefined,
+  ...args: any[]
+): Promise<T> {
+  const contract = await deploy<T>(name, options?.logger, ...args);
+
+  if (options?.verifier) {
+    options.verifier.addContract({
+      address: contract.address,
+      constructorArguments: args,
+    });
+  }
+
   return contract;
 }

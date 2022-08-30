@@ -1,22 +1,19 @@
-// @ts-ignore
-import { ethers } from "hardhat";
-// @ts-ignore
-import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/root-with-address";
 import {
   ADDRESS_0X0,
   IERC20__factory,
   NetworkType,
-  tokenDataByNetwork
+  tokenDataByNetwork,
 } from "@gearbox-protocol/sdk";
+import { ethers } from "hardhat";
 
 export async function detectNetwork(): Promise<NetworkType> {
-  const accounts = (await ethers.getSigners()) as Array<SignerWithAddress>;
+  const accounts = await ethers.getSigners();
   const deployer = accounts[0];
 
   try {
     const usdcMainnet = IERC20__factory.connect(
       tokenDataByNetwork.Mainnet.USDC,
-      deployer
+      deployer,
     );
     await usdcMainnet.balanceOf(ADDRESS_0X0);
     return "Mainnet";
@@ -24,7 +21,7 @@ export async function detectNetwork(): Promise<NetworkType> {
     try {
       const usdcMainnet = IERC20__factory.connect(
         tokenDataByNetwork.Goerli.USDC,
-        deployer
+        deployer,
       );
       await usdcMainnet.balanceOf(ADDRESS_0X0);
       return "Goerli";
