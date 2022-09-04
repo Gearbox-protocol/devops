@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 2021. Gearbox
  */
-import { callRepeater } from "@gearbox-protocol/sdk";
 import axios from "axios";
 import * as fs from "fs";
 import hre from "hardhat";
@@ -82,7 +81,7 @@ export class Verifier extends LoggedDeployer {
 
     for (let next of this.verifier) {
       try {
-        await callRepeater(() => this.verifyOne(next), 3);
+        await this.verifyOne(next);
       } catch (e) {
         this._logger.warn(`Failed to verify ${next.address}: ${e}`);
         failed.push(next);
@@ -99,7 +98,7 @@ export class Verifier extends LoggedDeployer {
     if (isVerified) {
       this._logger.debug(`${req?.address} is already verified`);
     } else {
-      this._logger.info(`Verifing: ${req?.address}`);
+      this._logger.info(`Verifying: ${req?.address}`);
       await hre.run("verify:verify", req);
       this._logger.debug("ok");
     }
