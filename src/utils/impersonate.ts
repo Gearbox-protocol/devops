@@ -18,3 +18,10 @@ export async function impersonate(address: string): Promise<SignerWithAddress> {
 
   return signer;
 }
+
+export async function stop_impersonate(address: string) {
+  await network.provider.request({
+    method: "hardhat_stopImpersonatingAccount",
+    params: [address],
+  });
+}
