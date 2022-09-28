@@ -2,8 +2,6 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { ethers, network } from "hardhat";
 
 export async function impersonate(address: string): Promise<SignerWithAddress> {
-  await network.provider.send("hardhat_impersonateAccount", [address]);
-
   await network.provider.request({
     method: "hardhat_impersonateAccount",
     params: [address],
