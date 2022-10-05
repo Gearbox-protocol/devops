@@ -77,19 +77,18 @@ export class Verifier extends LoggedDeployer {
 
     this._loadVerifierJson(false);
 
-    const failed: VerifyRequest[] = [];
-
-    for (let next of this.verifier) {
+    // eslint-disable-next-line @typescript-eslint/prefer-for-of
+    for (let i = 0; i < this.verifier.length; i++) {
+      const next = this.verifier.shift();
+      if (!next) break;
       try {
         await this.verifyOne(next);
       } catch (e) {
         this._logger.warn(`Failed to verify ${next.address}: ${e}`);
-        failed.push(next);
+        this.verifier.push(next);
       }
+      this._saveVerifier();
     }
-
-    this.verifier = failed;
-    this._saveVerifier();
   }
 
   protected async verifyOne(req: VerifyRequest): Promise<void> {
