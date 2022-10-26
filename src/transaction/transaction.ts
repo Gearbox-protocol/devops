@@ -67,7 +67,7 @@ export type ContractFactoryConstructor<T extends ContractFactory> = new (
 ) => T;
 export type ContractConstructor<T extends Contract> = new (...args: any[]) => T;
 
-async function waitForGasDeploy(logger: Logger | undefined, ...args: any[]) {
+async function waitForGasDeploy(logger: Logger | undefined, args: any[]) {
   if (args.length > 0 && typeof args[args.length - 1] === "object") {
     const gf = args[args.length - 1] as GasFee;
     await waitForGas(logger, gf);
