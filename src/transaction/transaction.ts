@@ -6,7 +6,6 @@ import {
   LOCAL_NETWORK,
 } from "@gearbox-protocol/sdk";
 import {
-  BigNumber,
   BigNumberish,
   Contract,
   ContractFactory,
@@ -79,19 +78,15 @@ async function waitForGas(logger: Logger | undefined, fee: GasFee) {
   const deployer = accounts[0];
 
   if (fee.maxFeePerGas) {
-    const maxBaseFee = BigNumber.from(fee.maxFeePerGas).sub(
-      fee.maxPriorityFeePerGas || BigNumber.from(0),
-    );
-
     // eslint-disable-next-line no-promise-executor-return
     const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 
     while (true) {
       const blockData = await deployer.provider?.getBlock("latest");
       if (blockData?.baseFeePerGas) {
-        if (blockData.baseFeePerGas.mul(1125).div(1000).gt(maxBaseFee)) {
+        if (blockData.baseFeePerGas.mul(1125).div(1000).gt(fee.maxFeePerGas)) {
           logger?.debug(
-            `Waiting for cheaper GAS, current: ${blockData.baseFeePerGas}, target: ${maxBaseFee}`,
+            `Waiting for cheaper GAS, current: ${blockData.baseFeePerGas}, target: ${fee.maxFeePerGas}`,
           );
           await delay(12000); // wait for next block - 12s
         } else {
