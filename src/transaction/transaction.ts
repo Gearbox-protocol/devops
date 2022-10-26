@@ -89,7 +89,7 @@ async function waitForGas(logger: Logger | undefined, fee: GasFee) {
     while (true) {
       const blockData = await deployer.provider?.getBlock("latest");
       if (blockData?.baseFeePerGas) {
-        if (blockData.baseFeePerGas.add(5).gt(maxBaseFee)) {
+        if (blockData.baseFeePerGas.mul(1125).div(1000).gt(maxBaseFee)) {
           logger?.debug(
             `Waiting for cheaper GAS, current: ${blockData.baseFeePerGas}, target: ${maxBaseFee}`,
           );
