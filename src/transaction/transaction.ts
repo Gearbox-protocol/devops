@@ -83,13 +83,19 @@ async function waitForGas(logger: Logger | undefined, fee: GasFee) {
       fee.maxPriorityFeePerGas || BigNumber.from(0),
     );
 
+    // eslint-disable-next-line no-promise-executor-return
+    const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
+
     while (true) {
       const blockData = await deployer.provider?.getBlock("latest");
       if (blockData?.baseFeePerGas) {
-        if (blockData.baseFeePerGas.gt(maxBaseFee.add(2))) {
+        if (blockData.baseFeePerGas.add(5).gt(maxBaseFee)) {
           logger?.debug(
             `Waiting for cheaper GAS, current: ${blockData.baseFeePerGas}, target: ${maxBaseFee}`,
           );
+          await delay(12000); // wait for next block - 12s
+        } else {
+          break;
         }
       } else {
         logger?.error("Cant get base fee from latest block");
