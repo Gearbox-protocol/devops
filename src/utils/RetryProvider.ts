@@ -13,6 +13,9 @@ export class RetryProvider extends providers.StaticJsonRpcProvider {
   }
 
   public perform(method: string, params: any) {
+    if (this.attempts === 0) {
+      return super.perform(method, params);
+    }
     let attempts = 0;
     return utils.poll(() => {
       attempts++;
