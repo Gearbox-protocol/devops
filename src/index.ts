@@ -6,5 +6,6 @@ export * from "./utils/balanceComparator";
 export * from "./utils/expect";
 export * from "./utils/getNetwork";
 export * from "./utils/impersonate";
+export * from "./utils/RetryProvider";
 export * from "./utils/testUtils";
 export * from "./verifier";
