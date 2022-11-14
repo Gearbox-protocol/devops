@@ -12,25 +12,27 @@ export class RetryProvider extends providers.StaticJsonRpcProvider {
     this.attempts = attempts;
   }
 
-  public perform(method: string, params: any) {
+  send(method: string, params: Array<any>): Promise<any> {
     if (this.attempts === 0) {
-      return super.perform(method, params);
+      return super.send(method, params);
     }
-    let attempts = 0;
-    return utils.poll(() => {
-      attempts++;
-      return super.perform(method, params).then(
-        result => {
-          return result;
-        },
-        (error: any) => {
-          if (error.statusCode !== 429 || attempts >= this.attempts) {
-            return Promise.reject(error);
-          } else {
-            return Promise.resolve(undefined);
+    return utils.poll(
+      async () => {
+        try {
+          const res = await super.send(method, params);
+          return res;
+        } catch (e: any) {
+          // Retry these 2 types of errors
+          if (
+            e.code === utils.Logger.errors.SERVER_ERROR ||
+            e.code === utils.Logger.errors.NETWORK_ERROR
+          ) {
+            return undefined;
           }
-        },
-      );
-    });
+          throw e;
+        }
+      },
+      { retryLimit: this.attempts },
+    );
   }
 }
