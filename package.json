@@ -30,7 +30,7 @@
   "devDependencies": {
     "@gearbox-protocol/eslint-config": "^1.5.7",
     "@gearbox-protocol/prettier-config": "^1.4.1",
-    "@gearbox-protocol/sdk": "^1.2.0",
+    "@gearbox-protocol/sdk": "^1.18.3",
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.5",
     "@nomiclabs/hardhat-ethers": "^2.1.1",
     "@types/chai": "^4.3.3",

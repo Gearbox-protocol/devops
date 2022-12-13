@@ -34,6 +34,18 @@ const waitingTime = async () => {
     : 4;
 };
 
+const printReceipt = (logger: Logger, txReceipt: TransactionReceipt) => {
+  logger.debug(`Tx: ${txReceipt.transactionHash}`);
+
+  const priceInfo = txReceipt.effectiveGasPrice
+    ? `@ ${formatBN(txReceipt.effectiveGasPrice, 9)} gwei.  Total: ${formatBN(
+        txReceipt.gasUsed.mul(txReceipt.effectiveGasPrice),
+        18,
+      )} ETH`
+    : "";
+  logger.debug(`Gas used: ${txReceipt.gasUsed.toString()} ${priceInfo}`);
+};
+
 export async function waitForTransaction(
   transaction: Promise<ContractTransaction>,
   logger?: Logger,
@@ -47,16 +59,7 @@ export async function waitForTransaction(
   const txReceipt = await request.wait(await waitingTime());
 
   if (logger) {
-    logger.debug(`Tx: ${txReceipt.transactionHash}`);
-    logger.debug(
-      `Gas used: ${txReceipt.gasUsed.toString()} @ ${formatBN(
-        txReceipt.effectiveGasPrice,
-        9,
-      )} gwei.  Total: ${formatBN(
-        txReceipt.gasUsed.mul(txReceipt.effectiveGasPrice),
-        18,
-      )} ETH`,
-    );
+    printReceipt(logger, txReceipt);
   }
 
   return txReceipt;
@@ -118,17 +121,12 @@ export async function deploy<T extends Contract>(
   logger?.debug(`Deploying ${name}...`);
   await contract.deployed();
   const txReceipt = await contract.deployTransaction.wait(await waitingTime());
-  logger?.debug(`Deployed ${name} to ${contract.address}`);
-  logger?.debug(`Tx: ${txReceipt.transactionHash}`);
-  logger?.debug(
-    `Gas used: ${txReceipt.gasUsed.toString()} @ ${formatBN(
-      txReceipt.effectiveGasPrice,
-      9,
-    )} gwei.  Total: ${formatBN(
-      txReceipt.gasUsed.mul(txReceipt.effectiveGasPrice),
-      18,
-    )} ETH`,
-  );
+
+  if (logger) {
+    logger.debug(`Deployed ${name} to ${contract.address}`);
+    printReceipt(logger, txReceipt);
+  }
+
   return contract;
 }
 
