@@ -28,7 +28,7 @@ const waitingTime = async () => {
   const chainId = await deployer.getChainId();
 
   return chainId === LOCAL_NETWORK || chainId === HARDHAT_NETWORK
-    ? 0
+    ? 1
     : chainId === GOERLI_NETWORK
     ? 2
     : 4;
