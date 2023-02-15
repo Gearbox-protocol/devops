@@ -13,6 +13,15 @@ export interface VerifyRequest {
   constructorArguments: Array<any>;
 }
 
+export interface EtherscanSource {
+  sources: Record<
+    string,
+    {
+      content: string;
+    }
+  >;
+}
+
 export class Verifier extends LoggedDeployer {
   protected verifier: Array<VerifyRequest> = [];
 
@@ -24,7 +33,7 @@ export class Verifier extends LoggedDeployer {
   public constructor() {
     super();
     // this is the name of the network in hardhat.config.ts, so "testnet" won't work
-    this._networkName = hre.network.name;
+    this._networkName = "mainnet"; // hre.network.name;
 
     this._knownNetwork = ["mainnet", "goerli"].includes(this._networkName);
 
@@ -88,6 +97,62 @@ export class Verifier extends LoggedDeployer {
         this.verifier.push(next);
       }
       this._saveVerifier();
+    }
+  }
+
+  public async compareWithGithub(address: string) {
+    this.enableLogs();
+    this._logger.debug(`Checking contracts fro ${address}`);
+    const url = `${this._baseUrl(
+      this._networkName,
+    )}/api?module=contract&action=getsourcecode&address=${address}&apikey=${
+      this._apiKey
+    }`;
+    const source = await axios.get(url);
+    if (!source.data.result || source.data.status !== "1") {
+      console.error(source);
+      throw new Error("Cant get source from etherscan");
+    }
+
+    const etherscanResponse = (source.data.result as Array<any>).map(
+      c => c.SourceCode,
+    );
+
+    const etherscanData: EtherscanSource = JSON.parse(
+      etherscanResponse[0].substr(1, etherscanResponse[0].length - 2),
+    );
+
+    for (let [entry, data] of Object.entries(etherscanData.sources)) {
+      if (entry.startsWith("@gearbox-protocol")) {
+        const githubName = entry
+          .replace(
+            "@gearbox-protocol",
+            "https://raw.githubusercontent.com/Gearbox-protocol",
+          )
+          .replace("core-v2/", "core-v2/main/")
+          .replace("integrations-v2/", "integrations-v2/main/");
+
+        const githubSource = await this.getGithubSource(githubName);
+
+        if (data.content.trim() !== githubSource.trim()) {
+          this._logger.error(`Contract ${entry} is not identical!`);
+          this._logger.info(`Etherscan version:\n${data.content}`);
+          this._logger.info(`Github version:\n${githubSource}`);
+        } else {
+          this._logger.debug(`Contract ${entry} is identical with main branch`);
+        }
+      } else {
+        this._logger.warn(`Contract ${entry} is skipped from checking`);
+      }
+    }
+  }
+
+  protected async getGithubSource(url: string): Promise<string> {
+    try {
+      const githubSource = await axios.get(url);
+      return githubSource.data;
+    } catch (e) {
+      throw new Error(`cant get github file, ${e}`);
     }
   }
 
