@@ -51,12 +51,8 @@ export class RotateProvider extends prov.BaseProvider {
       return this.network;
     }
     const networks = await Promise.all(this.providers.map(c => c.getNetwork()));
-    console.log(networks.length, this.providers.length);
     const network = networks[0];
-    const ok = networks.every(n => {
-      console.log(n);
-      return n.chainId === network.chainId;
-    });
+    const ok = networks.every(n => n.chainId === network.chainId);
     if (!ok) {
       throw new Error("chain id mismatch");
     }
@@ -84,7 +80,9 @@ export class RotateProvider extends prov.BaseProvider {
             (e instanceof Error && e.message === "retry limit reached")
           ) {
             next = (next + 1) % this.providers.length;
-            this.logger?.warn(`switching to provider number #${next}`);
+            this.logger?.warn(
+              `switching to provider number #${next} due to: ${e}`,
+            );
           } else {
             throw e;
           }
