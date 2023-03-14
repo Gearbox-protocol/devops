@@ -1,4 +1,3 @@
-import { defineReadOnly } from "@ethersproject/properties";
 import { providers as prov } from "ethers";
 import pRetry from "p-retry";
 
@@ -8,6 +7,11 @@ interface Logger {
   warn: (...args: unknown[]) => void;
 }
 
+/**
+ * RotateProvider gets a list of other providers
+ * It will use first available provider, and when it fails will switch to next, in round-robin manner
+ * If for single network call all providers fail, it will fail as well
+ */
 export class RotateProvider extends prov.BaseProvider {
   private readonly providers: prov.JsonRpcProvider[];
   private readonly logger?: Logger;
@@ -50,14 +54,18 @@ export class RotateProvider extends prov.BaseProvider {
     if (this.network) {
       return this.network;
     }
-    const networks = await Promise.all(this.providers.map(c => c.getNetwork()));
-    const network = networks[0];
-    const ok = networks.every(n => n.chainId === network.chainId);
-    if (!ok) {
-      throw new Error("chain id mismatch");
+    // assume that all providers return same chain id and do not compare
+    // get the first one because some might be unreachable
+    for (const provider of this.providers) {
+      try {
+        this._network = await provider.getNetwork();
+        break;
+      } catch {}
     }
-    defineReadOnly(this, "_network", network);
-    return network;
+    if (!this.network) {
+      throw new Error("all providers are unreachable");
+    }
+    return this.network;
   }
 
   override async perform(
