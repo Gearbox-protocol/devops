@@ -45,14 +45,11 @@ export class RetryProvider extends providers.StaticJsonRpcProvider {
       : undefined;
   }
 
-  override async perform(
-    method: string,
-    params: { [name: string]: any },
-  ): Promise<any> {
+  override async send(method: string, params: Array<any>): Promise<any> {
     if (this.attempts === 0) {
-      return super.perform(method, params);
+      return super.send(method, params);
     }
-    return pRetry(async () => super.perform(method, params), {
+    return pRetry(async () => super.send(method, params), {
       retries: this.attempts,
       minTimeout: 200,
       maxTimeout: 1000,

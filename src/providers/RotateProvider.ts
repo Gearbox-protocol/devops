@@ -78,6 +78,10 @@ export class RotateProvider extends prov.BaseProvider {
     return this.withRotation(next => this.providers[next].getLogs(filter));
   }
 
+  async send(method: string, params: Array<any>): Promise<any> {
+    return this.withRotation(next => this.providers[next].send(method, params));
+  }
+
   override async perform(
     method: string,
     params: { [name: string]: any },
