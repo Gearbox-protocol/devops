@@ -1,3 +1,4 @@
+import type { FilterByBlockHash } from "@ethersproject/abstract-provider";
 import { providers as prov } from "ethers";
 import pRetry from "p-retry";
 
@@ -68,14 +69,29 @@ export class RotateProvider extends prov.BaseProvider {
     return this.network;
   }
 
+  override async getLogs(
+    filter:
+      | prov.Filter
+      | FilterByBlockHash
+      | Promise<prov.Filter | FilterByBlockHash>,
+  ): Promise<prov.Log[]> {
+    return this.withRotation(next => this.providers[next].getLogs(filter));
+  }
+
   override async perform(
     method: string,
     params: { [name: string]: any },
   ): Promise<any> {
+    return this.withRotation(next =>
+      this.providers[next].perform(method, params),
+    );
+  }
+
+  private async withRotation<T>(fn: (next: number) => Promise<T>) {
     let next = this.i;
     return pRetry(
       async () => {
-        const resp = this.providers[next].perform(method, params);
+        const resp = await fn(next);
         this.i = next;
         return resp;
       },
